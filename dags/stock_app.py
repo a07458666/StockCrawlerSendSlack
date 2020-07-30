@@ -40,11 +40,16 @@ def get_stock_history(**context):
 def readCsv(path):
     df = pd.read_csv(path)
     num = ntpath.basename(path)[:-3]
+    index = df.shape[0] - 1
+    dawnRaid = calculationDawnRaid(df.values[index][2], df.values[index][3])
+    return str(df.values[index][1]) + ' , ' + str(df.values[index][2]) + ', ' + str(df.values[index][3]) + ' , ' + str((dawnRaid)) + '%\n'
 
-    return str(df.values[0][1]) + ' , ' + str(df.values[0][2]) + ' , ' + str(psn(df.values[0][2], df.values[0][3])) + '%\n'
-
-def psn(n, y):
-    value = (n -y) / y * 100 
+def calculationDawnRaid(nowPrice, yesterdayPrice):
+    if (nowPrice == '-' or yesterdayPrice == '-'):
+        return '-'
+    nowPrice = float(n)
+    yesterdayPrice = float(yesterdayPrice)
+    value = (nowPrice - yesterdayPrice) / yesterdayPrice * 100 
     return round(value, 2)
 
 def get_message_text():

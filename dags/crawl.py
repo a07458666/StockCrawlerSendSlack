@@ -60,7 +60,7 @@ class Recorder(object):
             os.mkdir(self.folder_path)
 
     def record_to_csv(self, data):
-        print('data ', data[0])
+        #print('data ', data)
         for row in data:
             try:
                 file_path = '{}/{}.csv'.format(self.folder_path, row['c'])
