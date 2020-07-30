@@ -60,6 +60,7 @@ class Recorder(object):
             os.mkdir(self.folder_path)
 
     def record_to_csv(self, data):
+        print('data ', data[0])
         for row in data:
             try:
                 file_path = '{}/{}.csv'.format(self.folder_path, row['c'])
@@ -67,13 +68,15 @@ class Recorder(object):
                     writer = csv.writer(output_file, delimiter=',')
                     writer.writerow([
                         row['t'],# 資料時間
+                        row['n'],# 名子
                         row['z'],# 最近成交價
-                        row['tv'],# 當盤成交量
-                        row['v'],# 當日累計成交量
-                        row['a'],# 最佳五檔賣出價格
-                        row['f'],# 最價五檔賣出數量
-                        row['b'],# 最佳五檔買入價格
-                        row['g']# 最佳五檔買入數量
+                        row['y'] # 昨收價
+                        # row['tv'],# 當盤成交量
+                        # row['v'],# 當日累計成交量
+                        # row['a'],# 最佳五檔賣出價格
+                        # row['f'],# 最價五檔賣出數量
+                        # row['b'],# 最佳五檔買入價格
+                        # row['g']# 最佳五檔買入數量
                     ])
 
             except Exception as err:
@@ -82,7 +85,6 @@ class Recorder(object):
 def RunCrawl():
     print('os.path ', os.getcwd())
     targets = [_.strip() for _ in open('stocknumber.csv', 'r')]
-
     controller = CrawlerController(targets)
     data = controller.run()
 

@@ -18,10 +18,11 @@ from glob import glob
 import pandas as pd
 import ntpath
 
+#local_tz = pendulum.timezone("Asia/Taipei")
+
 default_args = {
     'owner': 'AndySu',
     'start_date': datetime(2020, 7, 26, 9, 5),
-    'schedule_interval': '@daily',
     'retries': 2,
     'retry_delay': timedelta(minutes=1)
 }
@@ -40,7 +41,11 @@ def readCsv(path):
     df = pd.read_csv(path)
     num = ntpath.basename(path)[:-3]
 
-    return '股票代碼: ' + num +' 價格:' + str(df.values[0][1]) + '\n'
+    return str(df.values[0][1]) + ' , ' + str(df.values[0][2]) + ' , ' + str(psn(df.values[0][2], df.values[0][3])) + '%\n'
+
+def psn(n, y):
+    value = (n -y) / y * 100 
+    return round(value, 2)
 
 def get_message_text():
     file_dir = os.path.dirname(__file__)
@@ -61,7 +66,6 @@ def send_notification(**context):
 def send_msg(msg):
     # HTTP POST Request
     s_url = get_slack_url()
-
     dict_headers = {'Content-type': 'application/json'}
 
     dict_payload = {
@@ -71,10 +75,11 @@ def send_msg(msg):
     rtn = requests.post(s_url, data=json_payload, headers=dict_headers)
     print(rtn.text)
 
-with DAG('stock_app', default_args=default_args) as dag:
+#with DAG('stock_app', default_args=default_args, schedule_interval = '*/20 9-13 * * *') as dag:
+with DAG('stock_app', default_args=default_args, schedule_interval = '*/1 * * * *') as dag:
 
     # define tasks
-    latest_only = LatestOnlyOperator(task_id='latest_only')
+    #latest_only = LatestOnlyOperator(task_id='latest_only')
 
     get_stock_history = PythonOperator(
         task_id='get_stock_history',
@@ -89,5 +94,4 @@ with DAG('stock_app', default_args=default_args) as dag:
     )
 
     # define workflow
-    latest_only >> get_stock_history
     get_stock_history >> send_notification
